@@ -17,7 +17,7 @@ class CreateRaffleEntriesTable extends Migration
             $table->id();
             $table->string('full_name');
             $table->string('phone_number');
-            $table->string('raffle_name');
+            $table->integer('raffle_id');
             $table->uuid('raffle_entry_id')->unique();
             $table->boolean('is_valid')->default(true);
             $table->timestamps();

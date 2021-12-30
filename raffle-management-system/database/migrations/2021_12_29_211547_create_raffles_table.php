@@ -15,6 +15,7 @@ class CreateRafflesTable extends Migration
     {
         Schema::create('raffles', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->timestamps();
         });
     }
