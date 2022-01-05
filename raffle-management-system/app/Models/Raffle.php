@@ -10,6 +10,7 @@ class Raffle extends Model
     use HasFactory;
 
     protected $fillable  = [
-        'name'
+        'name',
+        'winners'
     ];
 }
