@@ -40,6 +40,7 @@
         const raffleButton = document.getElementById('raffle-button');
         const raffleForm = document.getElementById('raffleCreator');
 
+
         raffleButton.addEventListener('click', async () => {
             // Stops the page from reloading
             event.preventDefault();

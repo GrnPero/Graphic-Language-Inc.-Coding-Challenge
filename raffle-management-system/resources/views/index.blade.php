@@ -17,39 +17,101 @@
 
     <section class="p-5">
         <div class="container">
-            <div class="mx-3 mb-3 dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                    Raffles
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <form class="mx-3 mb-3" id="raffle-entry" action="submitRaffleEntry" method="POST">
+                @csrf
+                <div class="btn-group mb-3" role="group" aria-label="Basic checkbox toggle button group">
                     @foreach($raffles as $raffle)
-                        <li><button id={{ $raffle->id }} class="dropdown-item">{{ $raffle->name }}</button></li>
+                        <input type="checkbox" class="btn-check" id="{{ $raffle->id }}" 
+                            autocomplete="off" name="checkbox_{{ $raffle->id }}" value="{{ $raffle->id }}">
+                        <label class="btn btn-outline-primary" for="{{ $raffle->id }}">{{ $raffle->name }}</label>
                     @endforeach
-                </ul>
-            </div>
-
-            <form class="mx-3 mb-3">
+                </div>
                 <div class="mb-3 row">
                     <label for="name" class="col-sm-2 col-form-label">Full Name</label>
                     <div class="col-sm-5">
-                        <input class="form-control" id="name">
+                        <textarea class="form-control" id="name" name="full_name"></textarea>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <label for="phone" class="col-sm-2 col-form-label">Phone Number</label>
                     <div class="col-sm-5">
-                        <input class="form-control" id="phone">
+                        <textarea class="form-control" id="phone" name="phone"></textarea>
                     </div>
                 </div>
 
-
                 <div class="pt-3 col-sm-10">
-                    <button type="submit" class="btn btn-primary mb-3">Send Raffle</button>
+                    <button id="send-raffle" type="submit" class="btn btn-primary mb-3">Send Raffle</button>
                 </div>        
             </form>
         </div> 
     </section>
+
+    <script>
+        /* Deals with making sure the user can only select two checkboxes */
+        let raffleSelected = 0;
+        let arr = [];
+
+        @foreach($raffles as $raffle)
+            arr.push(document.getElementById({{ $raffle->id }}));
+        @endforeach
+
+        for (const raffle of arr) {
+            raffle.addEventListener('click', () => {
+                if (raffleSelected < 2) {
+                    if (raffle.checked == true) {
+                        raffleSelected++;
+                    } else if (raffle.checked == false) {
+                        raffleSelected--;
+                    }
+                } else if (raffle.checked == false) {
+                    raffleSelected--;
+                } else {
+                    raffle.checked = false;
+                }
+            });
+        }
+
+        // Add event listener when user sends their raffle
+        const sendRaffleButton = document.getElementById('send-raffle');
+        const raffleEntryForm = document.getElementById('raffle-entry');
+
+        sendRaffleButton.addEventListener('click', async () => {
+            // Stop page reload
+            event.preventDefault(); 
+
+            let formData = new FormData(raffleEntryForm); 
+
+            let raffleEntryData = {};
+
+            // Make an array of the raffles selected
+            let rafflesSelected = [];
+
+            for (const raffle of arr) {
+                if (raffle.checked == true) {
+                    rafflesSelected.push(raffle.id);                    
+                }
+            }
+
+            for (var pair of formData.entries()) {
+                raffleEntryData[pair[0]] = pair[1]; 
+            }
+
+            const response = await fetch('/submitRaffle', {
+                method: 'POST',
+                credentials: "same-origin",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'url': '/createRaffle',
+                    "X-CSRF-Token": document.querySelector('input[name=_token]').value
+                },
+                body: JSON.stringify(raffleEntryData)
+            });
+        });
+
+
+    </script>
 
     <!--JavaScript-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>

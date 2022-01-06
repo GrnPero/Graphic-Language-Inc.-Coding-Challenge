@@ -22,7 +22,7 @@ class RaffleController extends Controller
 
     // Returns all raffles to the raffle-creation page
     public function getAllRaffles() {
-        return view('raffle', $this->getRaffles());
+        return view('raffle')->with('raffles', $this->getRaffles());
     }
 
     // Submits Raffle to the database
